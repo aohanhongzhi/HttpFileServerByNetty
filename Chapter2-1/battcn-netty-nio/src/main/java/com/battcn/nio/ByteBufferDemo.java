@@ -1,4 +1,4 @@
-package com.battcn.nio;
+package com.battcn.bio;
 
 import org.junit.Test;
 
