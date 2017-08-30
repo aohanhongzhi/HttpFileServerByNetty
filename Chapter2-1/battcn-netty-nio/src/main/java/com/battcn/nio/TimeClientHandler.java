@@ -95,7 +95,7 @@ public class TimeClientHandler implements Runnable {
                     byte[] bytes = new byte[readBuffer.remaining()];
                     readBuffer.get(bytes);
                     String msg = new String(bytes, "UTF-8");
-                    System.out.println("接收到的消息:" + msg);
+                    System.out.println("TimeClient 接收到的消息:" + msg);
                 }
                 this.stop = true;//如果接收完毕退出循环
             }

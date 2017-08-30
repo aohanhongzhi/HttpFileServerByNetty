@@ -81,7 +81,7 @@ public class MultiplexerTimeServer implements Runnable {
                     buffer.get(bytes);
                     String msg = new String(bytes, "UTF-8");
                     System.out.println("TimeServer 接收到的消息 :" + msg);
-                    doWrite(sc, "问：" + msg + "答：...");
+                    doWrite(sc, "挽歌君老帅了...");
                 } else if (read < 0) {
                     key.cancel();
                     sc.close();
