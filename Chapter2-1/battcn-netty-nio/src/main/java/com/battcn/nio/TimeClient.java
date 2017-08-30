@@ -6,15 +6,10 @@ package com.battcn.nio;
  * @author Levin
  * @create 2017/8/30 0030
  */
-public class TimeServer {
+public class TimeClient {
 
     public static void main(String[] args) {
         int port = 4040;
-        MultiplexerTimeServer timeServer = new MultiplexerTimeServer(port);
-        new Thread(timeServer,"NIO-MultiplexerTimeServer-1").start();
-
+        new Thread(new TimeClientHandler("127.0.0.1",port),"NIO-MultiplexerTimeServer-1").start();
     }
-
-
-
 }

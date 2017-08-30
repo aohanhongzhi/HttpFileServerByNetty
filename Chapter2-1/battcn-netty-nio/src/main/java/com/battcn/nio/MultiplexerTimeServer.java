@@ -18,7 +18,6 @@ public class MultiplexerTimeServer implements Runnable {
 
     private Selector selector;
     private ServerSocketChannel serverSocketChannel;
-    private volatile boolean stop;
 
     public MultiplexerTimeServer(int port) {
         try {
@@ -27,61 +26,53 @@ public class MultiplexerTimeServer implements Runnable {
             serverSocketChannel.configureBlocking(false);//设置异步非阻塞模式
             serverSocketChannel.bind(new InetSocketAddress(port), 1024);//绑定端口为4040并且初始化系统资源位1024个
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);//将Channel管道注册到Selector中去,监听OP_ACCEPT操作
-            System.out.println("The time server is start in port : " + port);
+            System.out.println("TimeServer启动成功,当前监听的端口 : " + port);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);//如果初始化失败，退出
         }
     }
 
-    public void stop() {
-        this.stop = true;
-    }
 
     @Override
     public void run() {
-        while (!this.stop) {
+        while (true) {
             try {
-                this.selector.select(1000);//1S唤醒一次
-                Set<SelectionKey> selectionKeys = this.selector.selectedKeys();
-                Iterator<SelectionKey> iterator = selectionKeys.iterator();
-                while (iterator.hasNext()) {
-                    SelectionKey selectionKey = iterator.next();
-                    iterator.remove();//删掉处理过的key
-                    try {
-                        handleInput(selectionKey);
-                    } catch (Exception e) {
-                        if (selectionKey != null) {
-                            selectionKey.cancel();
-                            if (selectionKey.channel() != null)
-                                selectionKey.channel().close();
+                //int select = this.selector.select(1000); 1S唤醒一次,加休眠时间则可以不要if(select > 0 )
+                int select = selector.select();
+                if (select > 0) {
+                    Set<SelectionKey> selectionKeys = this.selector.selectedKeys();
+                    Iterator<SelectionKey> it = selectionKeys.iterator();
+                    while (it.hasNext()) {
+                        SelectionKey key = it.next();
+                        it.remove();//删掉处理过的key
+                        try {
+                            handleInput(key);
+                        } catch (Exception e) {
+                            if (key != null) {
+                                key.cancel();
+                                if (key.channel() != null)
+                                    key.channel().close();
+                            }
                         }
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                if (selector != null) {
-                    try {
-                        selector.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
     }
 
-    private void handleInput(SelectionKey selectionKey) throws IOException {
-        if (selectionKey.isValid()) {//处理新接入的请求消息
-            if (selectionKey.isAcceptable()) {
-                ServerSocketChannel sc = (ServerSocketChannel) selectionKey.channel();
-                SocketChannel accept = sc.accept();
+    private void handleInput(SelectionKey key) throws IOException {
+        if (key.isValid()) {//处理新接入的请求消息
+            if (key.isAcceptable()) {
+                SocketChannel accept = ((ServerSocketChannel) key.channel()).accept();
                 accept.configureBlocking(false);
+                //添加新的连接到selector中
                 accept.register(this.selector, SelectionKey.OP_READ);
             }
-            if (selectionKey.isReadable()) {//读取数据
-                SocketChannel sc = (SocketChannel) selectionKey.channel();
+            if (key.isReadable()) {//读取数据
+                SocketChannel sc = (SocketChannel) key.channel();
                 ByteBuffer buffer = ByteBuffer.allocate(1024);//一次最多读取1024
                 int read = sc.read(buffer);
                 if (read > 0) {
@@ -89,23 +80,25 @@ public class MultiplexerTimeServer implements Runnable {
                     byte[] bytes = new byte[buffer.remaining()];
                     buffer.get(bytes);
                     String msg = new String(bytes, "UTF-8");
-                    System.out.println("The time server receive order :" + msg);
-                    doWrite(sc, "hello client");
+                    System.out.println("TimeServer 接收到的消息 :" + msg);
+                    doWrite(sc, "问：" + msg + "答：...");
                 } else if (read < 0) {
-                    selectionKey.cancel();
+                    key.cancel();
                     sc.close();
+                } else {
+                    //读取0个字节忽略
                 }
             }
         }
     }
 
-    private void doWrite(SocketChannel sc, String resp) throws IOException {
+    private void doWrite(SocketChannel channel, String resp) throws IOException {
         if (resp != null && resp.trim().length() > 0) {
             byte[] bytes = resp.getBytes();
-            ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
-            buffer.put(bytes);
-            buffer.flip();
-            sc.write(buffer);
+            ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);//根据字节大小创建一个Buffer
+            writeBuffer.put(bytes);//将字节数组复制到缓冲区
+            writeBuffer.flip();//切换操作模式
+            channel.write(writeBuffer);//调用管道API将数据写出
         }
     }
 }
