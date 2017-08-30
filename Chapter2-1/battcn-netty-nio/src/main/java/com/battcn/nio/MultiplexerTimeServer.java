@@ -23,7 +23,7 @@ public class MultiplexerTimeServer implements Runnable {
         try {
             selector = Selector.open();//打开多路复用器
             serverSocketChannel = ServerSocketChannel.open();//打开ServerSocket通道
-            serverSocketChannel.configureBlocking(false);//设置异步非阻塞模式
+            serverSocketChannel.configureBlocking(false);//设置异步非阻塞模式,与Selector使用 Channel 必须处于非阻塞模式
             serverSocketChannel.bind(new InetSocketAddress(port), 1024);//绑定端口为4040并且初始化系统资源位1024个
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);//将Channel管道注册到Selector中去,监听OP_ACCEPT操作
             System.out.println("TimeServer启动成功,当前监听的端口 : " + port);
@@ -39,6 +39,10 @@ public class MultiplexerTimeServer implements Runnable {
         while (true) {
             try {
                 //int select = this.selector.select(1000); 1S唤醒一次,加休眠时间则可以不要if(select > 0 )
+                if (!selector.isOpen()) {
+                    System.out.println("selector is closed");
+                    break;
+                }
                 int select = selector.select();
                 if (select > 0) {
                     Set<SelectionKey> selectionKeys = this.selector.selectedKeys();
@@ -76,7 +80,7 @@ public class MultiplexerTimeServer implements Runnable {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);//一次最多读取1024
                 int read = sc.read(buffer);
                 if (read > 0) {
-                    buffer.flip();//模式切换,写切换成读
+                    buffer.flip();//反转缓冲区
                     byte[] bytes = new byte[buffer.remaining()];
                     buffer.get(bytes);
                     String msg = new String(bytes, "UTF-8");
@@ -97,7 +101,7 @@ public class MultiplexerTimeServer implements Runnable {
             byte[] bytes = resp.getBytes();
             ByteBuffer writeBuffer = ByteBuffer.allocate(bytes.length);//根据字节大小创建一个Buffer
             writeBuffer.put(bytes);//将字节数组复制到缓冲区
-            writeBuffer.flip();//切换操作模式
+            writeBuffer.flip();//反转缓冲区
             channel.write(writeBuffer);//调用管道API将数据写出
         }
     }

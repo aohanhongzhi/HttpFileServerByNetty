@@ -91,7 +91,7 @@ public class TimeClientHandler implements Runnable {
                 ByteBuffer readBuffer = ByteBuffer.allocate(1024);//创建读取所需Buffer
                 int read = channel.read(readBuffer);
                 if (read > 0) {
-                    readBuffer.flip();//转换操作模式
+                    readBuffer.flip();//反转缓冲区
                     byte[] bytes = new byte[readBuffer.remaining()];
                     readBuffer.get(bytes);
                     String msg = new String(bytes, "UTF-8");
@@ -114,8 +114,8 @@ public class TimeClientHandler implements Runnable {
     private void doWrite(SocketChannel channel) throws IOException {
         byte[] req = "挽歌君帅不帅".getBytes();
         ByteBuffer buffer = ByteBuffer.allocate(req.length);
-        buffer.put(req);
-        buffer.flip();
+        buffer.put(req);//将字节数组复制到缓冲区
+        buffer.flip();//反转缓冲区
         channel.write(buffer);
         if (!buffer.hasRemaining()) {
             System.out.println("消息发送成功");
