@@ -53,7 +53,6 @@ public class TimeClient {
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             ctx.writeAndFlush(firstMessage);
         }
-
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             ByteBuf buf = (ByteBuf) msg;
@@ -61,7 +60,7 @@ public class TimeClient {
             buf.readBytes(req);
             String body = new String(req, "UTF-8");
             System.out.println("TimeClient 接收到的消息 :" + body);
-            ctx.close();//接受完消息关闭连接
+            //ctx.close();//接受完消息关闭连接
         }
 
         @Override
