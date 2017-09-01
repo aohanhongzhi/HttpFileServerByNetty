@@ -53,14 +53,9 @@ public class TimeServer {
 
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                //ByteBuf buf = (ByteBuf) msg;
-                //byte[] req = new byte[buf.readableBytes()];
-                //buf.readBytes(req);
-                //String body = new String(req, "UTF-8").substring(0, req.length - System.getProperty("line.separator").length());
                 String body = (String) msg;
                 System.out.println("TimeServer 接收到的消息 :" + body + "; 当前统计:" + ++counter);
-                String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? String.valueOf(System.currentTimeMillis()) : "BAD ORDER";
-                currentTime = currentTime + System.getProperty("line.separator");
+                String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? String.valueOf(System.currentTimeMillis())+"\n"  : "BAD ORDER";
                 ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
                 ctx.write(resp);
             }

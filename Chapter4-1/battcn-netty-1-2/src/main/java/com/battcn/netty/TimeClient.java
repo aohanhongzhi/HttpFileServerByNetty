@@ -46,9 +46,10 @@ public class TimeClient {
 
     private static class TimeClientHandler extends ChannelHandlerAdapter {
         private byte[] req;
+        private int counter;
 
         public TimeClientHandler() {
-            req = ("QUERY TIME ORDER" + System.getProperty("line.separator")).getBytes();
+            req = ("QUERY TIME ORDER\n").getBytes();
         }
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -60,17 +61,10 @@ public class TimeClient {
             }
         }
 
-        private int counter;
-
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            //ByteBuf buf = (ByteBuf) msg;
-            //byte[] req = new byte[buf.readableBytes()];
-            //buf.readBytes(req);
-            //String body = new String(req, "UTF-8");
             String body = (String) msg;
             System.out.println("TimeClient 接收到的消息 :" + body + "; 当前统计:" + ++counter);
-            ctx.close();//接受完消息关闭连接
         }
 
         @Override

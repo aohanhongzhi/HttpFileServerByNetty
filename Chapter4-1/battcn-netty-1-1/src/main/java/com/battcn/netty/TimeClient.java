@@ -42,15 +42,10 @@ public class TimeClient {
 
     private static class TimeClientHandler extends ChannelHandlerAdapter {
         private byte[] req;
-
         public TimeClientHandler() {
-            //byte[] req = "QUERY TIME ORDER ".getBytes();
-            //firstMessage = Unpooled.buffer(req.length);
-            //firstMessage.writeBytes(req);
             req = ("QUERY TIME ORDER" + System.getProperty("line.separator")).getBytes();
 
         }
-
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             ByteBuf message = null;
@@ -60,9 +55,7 @@ public class TimeClient {
                 ctx.writeAndFlush(message);
             }
         }
-
         private int counter;
-
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             ByteBuf buf = (ByteBuf) msg;
