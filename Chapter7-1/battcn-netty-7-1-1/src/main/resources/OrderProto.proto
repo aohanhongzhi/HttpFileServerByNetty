@@ -1,0 +1,18 @@
+package netty;
+option java_package = "com.battcn.netty.proto";
+option java_outer_classname = "OrderProto";
+
+
+message OrderRequest{
+    required int32 orderId = 1;
+    required string userName = 2;
+    required string productName = 3;
+	required string phoneNumber = 4;
+	required string address = 5;
+}
+
+message OrderResponse{
+    required int32 orderId = 1;
+    required string respCode = 2;
+    required string desc = 3;
+}
