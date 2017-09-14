@@ -169,7 +169,7 @@ public class HttpFileServerHandler extends
         buf.append(" 目录：");
         buf.append("</title></head><body>\r\n");
         buf.append("<h3>");
-        buf.append(dirPath).append(" 目录：");
+        buf.append(dirPath);
         buf.append("</h3>\r\n");
         buf.append("<ul>");
         buf.append("<li>链接：<a href=\"../\">..</a></li>\r\n");
