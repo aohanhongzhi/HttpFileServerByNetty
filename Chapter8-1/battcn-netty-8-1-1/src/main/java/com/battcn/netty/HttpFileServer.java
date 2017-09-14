@@ -43,8 +43,7 @@ public class HttpFileServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel channel)
-                                throws Exception {
+                        protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast("http-decoder", new HttpRequestDecoder());
                             channel.pipeline().addLast("http-aggregator", new HttpObjectAggregator(8 * 1024));
                             channel.pipeline().addLast("http-encoder", new HttpResponseEncoder());
