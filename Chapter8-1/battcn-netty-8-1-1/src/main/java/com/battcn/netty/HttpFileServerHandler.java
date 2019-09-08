@@ -102,9 +102,9 @@ public class HttpFileServerHandler extends
             public void operationProgressed(ChannelProgressiveFuture future,
                                             long progress, long total) {
                 if (total < 0) { // 为知长度
-                    System.err.println("进度: " + progress);
+                    System.out.println("进度: " + progress);
                 } else {
-                    System.err.println("进度: " + progress + " / " + total);
+                    System.out.println("进度: " + progress + " / " + total);
                 }
             }
 

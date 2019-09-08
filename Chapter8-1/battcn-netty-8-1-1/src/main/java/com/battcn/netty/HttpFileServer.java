@@ -30,9 +30,9 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 
 public class HttpFileServer {
     private static final int DEFAULT_PORT = 4040;
-    private static final String DEFAULT_IP = "127.0.0.1";
+    private static final String DEFAULT_IP = "192.168.3.5";
     //对应的映射目录
-    private static final String DEFAULT_HOME = "F:/battcn-workspace/battcn-netty/Chapter8-1/battcn-netty-8-1-1/src/main/java/com";
+    private static final String DEFAULT_HOME = "/home/eric/";
 
     static void run(final int port, final String path) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
